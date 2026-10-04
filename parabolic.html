@@ -33,11 +33,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 16px 20px;
+      padding: 14px 16px 18px;
       overflow: hidden;
     }
 
-    /* Cabeçalho do Equipamento */
+    /* Cabeçalho do Aparelho */
     .device-header {
       width: 100%;
       max-width: 420px;
@@ -45,11 +45,11 @@
       justify-content: space-between;
       align-items: flex-end;
       border-bottom: 1px solid #1e2922;
-      padding-bottom: 8px;
+      padding-bottom: 6px;
     }
 
     .brand-title {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       letter-spacing: 2px;
       color: #64748b;
       font-weight: 700;
@@ -72,14 +72,14 @@
       background: #0a0f0c;
       border: 2px solid #233429;
       border-radius: 12px;
-      padding: 12px;
+      padding: 10px;
       box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9), 0 10px 30px rgba(0, 0, 0, 0.8);
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
-    /* Tela de Fósforo Verde (CRT) */
+    /* Tela CRT de Fósforo Verde */
     .crt-screen {
       position: relative;
       width: 100%;
@@ -91,7 +91,6 @@
       box-shadow: inset 0 0 20px rgba(34, 197, 94, 0.15);
     }
 
-    /* Linhas de Grade de Osciloscópio */
     .crt-grid {
       position: absolute;
       inset: 0;
@@ -103,7 +102,6 @@
       z-index: 2;
     }
 
-    /* Scanlines retrô */
     .crt-screen::after {
       content: '';
       position: absolute;
@@ -122,7 +120,7 @@
       z-index: 1;
     }
 
-    /* Painel de Leituras Digitais */
+    /* Telemetria e Decibéis */
     .telemetry-row {
       display: flex;
       justify-content: space-between;
@@ -137,7 +135,7 @@
     }
 
     .db-val {
-      font-size: 2.2rem;
+      font-size: 2.1rem;
       font-weight: 800;
       color: var(--phosphor);
       text-shadow: 0 0 10px var(--phosphor-glow);
@@ -146,13 +144,13 @@
     }
 
     .db-unit {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: #15803d;
       letter-spacing: 1px;
     }
 
     .status-badge {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       letter-spacing: 1.5px;
       padding: 4px 10px;
       border-radius: 4px;
@@ -168,16 +166,16 @@
       box-shadow: 0 0 10px var(--phosphor-dim);
     }
 
-    /* Painel de Controles Inferiores */
+    /* Painel de Controles */
     .controls-panel {
       width: 100%;
       max-width: 420px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
-    /* Botão Calibrar Ponto Zero */
+    /* Botão de Calibração Neutro (Sem menção a Skull) */
     .btn-calibrate {
       width: 100%;
       padding: 12px;
@@ -186,7 +184,8 @@
       border-radius: 6px;
       color: #a7f3d0;
       font-family: inherit;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
+      font-weight: 700;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       cursor: pointer;
@@ -194,13 +193,15 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      transition: background 0.2s, border-color 0.2s;
     }
 
     .btn-calibrate:active {
       background: #1e3325;
+      border-color: var(--phosphor);
     }
 
-    /* Chave ON/OFF do Microfone */
+    /* Chave ON/OFF */
     .power-chassis {
       display: flex;
       align-items: center;
@@ -212,7 +213,7 @@
     }
 
     .power-label {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 700;
       color: #cbd5e1;
       letter-spacing: 2px;
@@ -220,10 +221,10 @@
 
     .switch {
       position: relative;
-      width: 60px;
-      height: 32px;
+      width: 58px;
+      height: 30px;
       background: #1e2922;
-      border-radius: 16px;
+      border-radius: 15px;
       cursor: pointer;
       transition: background 0.3s;
       border: 2px solid #2d4a36;
@@ -231,8 +232,8 @@
 
     .switch-lever {
       position: absolute;
-      top: 3px;
-      left: 4px;
+      top: 2px;
+      left: 3px;
       width: 22px;
       height: 22px;
       background: #64748b;
@@ -246,14 +247,14 @@
     }
 
     .switch.active .switch-lever {
-      transform: translateX(28px);
+      transform: translateX(27px);
       background: var(--phosphor);
       box-shadow: 0 0 10px var(--phosphor);
     }
 
     .hint-text {
       text-align: center;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: #475569;
       letter-spacing: 0.5px;
     }
@@ -267,9 +268,8 @@
     <span class="headset-tag">🎧 HEADPHONES CONNECTED</span>
   </div>
 
-  <!-- Gabinete Central do Osciloscópio -->
+  <!-- Gabinete do Osciloscópio -->
   <div class="scope-chassis">
-    <!-- Tela de Ondas -->
     <div class="crt-screen">
       <div class="crt-grid"></div>
       <canvas id="waveformCanvas"></canvas>
@@ -281,15 +281,15 @@
         <div class="db-val" id="dbDisplay">0.0</div>
         <div class="db-unit">dB // RMS</div>
       </div>
-      <div class="status-badge" id="signalStatus">SEARCHING</div>
+      <div class="status-badge" id="signalStatus">STANDBY</div>
     </div>
   </div>
 
   <!-- Controles -->
   <div class="controls-panel">
-    <!-- Botão de Calibração Relativa (Apontar para o Crânio) -->
+    <!-- Botão de Calibração Neutro -->
     <button class="btn-calibrate" id="btnCalibrate">
-      <span>🎯</span> Calibrate to Skull Position
+      <span>🎯</span> Calibrate Sensor Bearing
     </button>
 
     <!-- Interruptor ON/OFF -->
@@ -301,25 +301,24 @@
     </div>
 
     <div class="hint-text">
-      Plug school headset. Sweep phone across room to isolate acoustic signature.
+      Sweep across room to isolate target acoustic signature.
     </div>
   </div>
 
-  <!-- Áudios -->
+  <!-- ÁUDIOS: AMBOS EM LOOP CONTÍNUO E SIMULTÂNEO -->
   <audio id="audioVacuum" src="vacuo.mp3" loop preload="auto"></audio>
-  <audio id="audioEntity" src="banshee.mp3" preload="auto"></audio>
+  <audio id="audioEntity" src="banshee.mp3" loop preload="auto"></audio>
 
   <script>
     // ==========================================
-    // PARÂMETROS DO MICROFONE PARABÓLICO
+    // PARÂMETROS ANGULARES
     // ==========================================
-    const CONE_TOLERANCE = 18;        // Janela de foco em graus (cone de captação)
-    const HAUNT_INTERVAL = 60 * 1000; // Intervalo do uivo: 60 segundos (1 minuto)
+    const CONE_TOLERANCE = 18; // Raio de foco em graus (tolerância do cone de captura)
 
     let isPowered = false;
-    let currentSignal = 0; // 0.0 (fora de mira) a 1.0 (cravado no crânio)
+    let currentSignal = 0; // 0.0 (fora de mira) a 1.0 (sweet spot exato)
 
-    // Ângulos de calibração relativa
+    // Vetores de calibração
     let baseAlpha = null;
     let baseBeta = null;
     let currentAlpha = 0;
@@ -335,7 +334,6 @@
     const audioVacuum = document.getElementById('audioVacuum');
     const audioEntity = document.getElementById('audioEntity');
 
-    // Redimensionamento do Canvas
     function resizeCanvas() {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
@@ -344,19 +342,19 @@
     resizeCanvas();
 
     // ==========================================
-    // LIGA / DESLIGA (DESTRAMA ÁUDIO E SENSORES)
+    // CHAVE POWER: DESTRAVA SENSORES E DÁ PLAY EM AMBOS
     // ==========================================
     powerSwitch.addEventListener('click', async () => {
       isPowered = !isPowered;
       powerSwitch.classList.toggle('active', isPowered);
 
       if (isPowered) {
-        // Solicita permissão de orientação no iOS se necessário
+        // Permissão no iOS Safari se necessário
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
           try {
             const permission = await DeviceOrientationEvent.requestPermission();
             if (permission !== 'granted') {
-              alert('Orientation permission needed for directional mic.');
+              alert('Orientation permission required for directional mic.');
             }
           } catch (e) {
             console.warn(e);
@@ -365,17 +363,22 @@
 
         window.addEventListener('deviceorientation', handleOrientation);
 
-        // Inicia áudio de fundo
-        audioVacuum.volume = 0.05;
-        audioVacuum.play().catch(e => console.warn(e));
+        // Dispara ambos os áudios em loop simultâneo desde o início
+        audioVacuum.currentTime = 0;
+        audioEntity.currentTime = 0;
+        
+        // Volume inicial antes de computar o primeiro ângulo
+        audioVacuum.volume = 0.85;
+        audioEntity.volume = 0.0;
 
-        // Agenda o ciclo do uivo
-        startEntityTimer();
+        audioVacuum.play().catch(e => console.warn(e));
+        audioEntity.play().catch(e => console.warn(e));
+
+        updateOutputs();
       } else {
         window.removeEventListener('deviceorientation', handleOrientation);
         audioVacuum.pause();
         audioEntity.pause();
-        stopEntityTimer();
         currentSignal = 0;
         dbDisplay.textContent = '0.0';
         signalStatus.textContent = 'STANDBY';
@@ -383,18 +386,21 @@
       }
     });
 
-    // Calibração do Ponto Zero (Onde o crânio está)
+    // ==========================================
+    // CALIBRAÇÃO NEUTRA DO VETOR
+    // ==========================================
     btnCalibrate.addEventListener('click', () => {
       baseAlpha = currentAlpha;
       baseBeta = currentBeta;
-      btnCalibrate.textContent = "✓ Target Calibrated";
+      btnCalibrate.innerHTML = "<span>✓</span> Bearing Locked";
       setTimeout(() => {
-        btnCalibrate.textContent = "🎯 Calibrate to Skull Position";
-      }, 1500);
+        btnCalibrate.innerHTML = "<span>🎯</span> Calibrate Sensor Bearing";
+      }, 1400);
+      updateOutputs();
     });
 
     // ==========================================
-    // CAPTAÇÃO DE GIRO E INCLINAÇÃO (3D VECTOR)
+    // LEITURA DOS SENSORES (AZIMUTE E ALTURA)
     // ==========================================
     function handleOrientation(e) {
       if (!isPowered) return;
@@ -407,18 +413,18 @@
         baseBeta = currentBeta;
       }
 
-      // Distância angular horizontal com compensação circular
+      // Distância angular horizontal (menor arco no círculo de 360°)
       let diffAlpha = Math.abs(currentAlpha - baseAlpha);
       if (diffAlpha > 180) diffAlpha = 360 - diffAlpha;
 
-      // Distância angular vertical
+      // Distância angular vertical (inclinação)
       let diffBeta = Math.abs(currentBeta - baseBeta);
 
-      // Distância Euclidiana angular até o alvo do crânio
+      // Distância esférica combinada
       const totalAngularDiff = Math.sqrt(Math.pow(diffAlpha, 2) + Math.pow(diffBeta, 2));
 
       if (totalAngularDiff <= CONE_TOLERANCE) {
-        // Dentro do cone parabólico: calcula intensidade de 0.0 a 1.0
+        // Proximidade normalizada de 0.0 (fora) a 1.0 (sweet spot cravado)
         currentSignal = 1 - (totalAngularDiff / CONE_TOLERANCE);
       } else {
         currentSignal = 0;
@@ -427,54 +433,40 @@
       updateOutputs();
     }
 
-    // Atualização de Decibéis e Volumes
+    // ==========================================
+    // CUE DE ÁUDIO INVERTIDO (CROSSFADE DINÂMICO)
+    // ==========================================
     function updateOutputs() {
-      // Simula decibéis entre 0.2 e 24.5 dB com ruído natural
-      const noise = (Math.random() - 0.5) * 0.4;
-      const db = (currentSignal * 22.0) + (isPowered ? 0.3 : 0) + noise;
+      if (!isPowered) return;
+
+      // 1. Decibéis e Feedback de Texto
+      const noise = (Math.random() - 0.5) * 0.3;
+      const db = (currentSignal * 22.5) + 0.4 + noise;
       dbDisplay.textContent = Math.max(0, db).toFixed(1);
 
-      if (currentSignal > 0.75) {
+      if (currentSignal > 0.8) {
         signalStatus.textContent = "PARABOLIC LOCK";
         signalStatus.classList.add('locked');
-      } else if (currentSignal > 0.1) {
-        signalStatus.textContent = "SIGNAL WEAK";
+      } else if (currentSignal > 0.15) {
+        signalStatus.textContent = "SIGNAL DETECTED";
         signalStatus.classList.remove('locked');
       } else {
-        signalStatus.textContent = "NO ANOMALY";
+        signalStatus.textContent = "SEARCHING";
         signalStatus.classList.remove('locked');
       }
 
-      // Modula o volume do vácuo contínuo
-      audioVacuum.volume = Math.min(1.0, 0.05 + (currentSignal * 0.85));
+      // 2. VÁCUO/ESTÁTICA: Cai para quase zero conforme entra no foco
+      // Longe (0.0): ~0.85 | No Sweet Spot (1.0): 0.02 (resíduo quase imperceptível)
+      const vacuumVol = Math.max(0.02, (1 - Math.pow(currentSignal, 1.4)) * 0.85);
+      audioVacuum.volume = vacuumVol;
 
-      // Se o uivo estiver tocando, o volume dele sobe apenas se mirar no crânio
-      audioEntity.volume = Math.pow(currentSignal, 1.5);
+      // 3. ENTIDADE/UIVO: Sai do zero absoluto e atinge 1.0 no sweet spot
+      const entityVol = Math.pow(currentSignal, 1.8);
+      audioEntity.volume = entityVol;
     }
 
     // ==========================================
-    // CICLO TEMPORIZADO DO UIVO (A CADA 60s)
-    // ==========================================
-    let hauntIntervalId = null;
-
-    function startEntityTimer() {
-      stopEntityTimer();
-      hauntIntervalId = setInterval(() => {
-        if (!isPowered) return;
-        audioEntity.currentTime = 0;
-        audioEntity.play().catch(e => console.warn(e));
-      }, HAUNT_INTERVAL);
-    }
-
-    function stopEntityTimer() {
-      if (hauntIntervalId) {
-        clearInterval(hauntIntervalId);
-        hauntIntervalId = null;
-      }
-    }
-
-    // ==========================================
-    // RENDERIZAÇÃO DAS ONDAS DO OSCILOSCÓPIO (CANVAS)
+    // OSCILOSCÓPIO RETRÔ CRT (CANVAS)
     // ==========================================
     let phase = 0;
 
@@ -489,7 +481,6 @@
       ctx.beginPath();
       ctx.lineWidth = 2.5;
 
-      // Se estiver desligado: linha morta
       if (!isPowered) {
         ctx.strokeStyle = '#1e3828';
         ctx.moveTo(0, midY);
@@ -498,21 +489,19 @@
         return;
       }
 
-      // Cor muda de verde para âmbar se o sinal for forte
-      ctx.strokeStyle = currentSignal > 0.8 ? '#f59e0b' : '#22c55e';
-      ctx.shadowColor = currentSignal > 0.8 ? 'rgba(245, 158, 11, 0.6)' : 'rgba(34, 197, 94, 0.6)';
-      ctx.shadowBlur = 10;
+      // Muda de verde para âmbar quando crava no sweet spot
+      ctx.strokeStyle = currentSignal > 0.75 ? '#f59e0b' : '#22c55e';
+      ctx.shadowColor = currentSignal > 0.75 ? 'rgba(245, 158, 11, 0.6)' : 'rgba(34, 197, 94, 0.5)';
+      ctx.shadowBlur = 8;
 
-      // Amplitude cresce com a mira e com a intensidade do sinal
-      const baseAmp = 4;
-      const maxAmp = 65;
+      const baseAmp = 3;
+      const maxAmp = 60;
       const amp = baseAmp + (currentSignal * maxAmp);
 
-      phase += 0.18 + (currentSignal * 0.25);
+      phase += 0.15 + (currentSignal * 0.25);
 
       for (let x = 0; x < width; x++) {
-        // Composição de três ondas senoidais + jitter de ruído para simular frequência real
-        const jitter = (Math.random() - 0.5) * (1.5 + currentSignal * 8);
+        const jitter = (Math.random() - 0.5) * (1.5 + currentSignal * 7);
         const y = midY + 
                   Math.sin((x * 0.035) + phase) * amp * 0.6 +
                   Math.sin((x * 0.08) - phase * 1.5) * amp * 0.3 +
