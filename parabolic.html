@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Parabolic Audio Receptor</title>
+  <style>
+    :root {
+      --bg: #070908;
+      --panel: #111613;
+      --phosphor: #22c55e;
+      --phosphor-dim: rgba(34, 197, 94, 0.2);
+      --phosphor-glow: rgba(34, 197, 94, 0.4);
+      --amber: #f59e0b;
+      --red: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: #94a3b8;
+      font-family: 'Courier New', Courier, monospace;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 16px 20px;
+      overflow: hidden;
+    }
+
+    /* Cabeçalho do Equipamento */
+    .device-header {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 1px solid #1e2922;
+      padding-bottom: 8px;
+    }
+
+    .brand-title {
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    .headset-tag {
+      font-size: 0.65rem;
+      color: var(--amber);
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Gabinete do Osciloscópio */
+    .scope-chassis {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      background: #0a0f0c;
+      border: 2px solid #233429;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9), 0 10px 30px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Tela de Fósforo Verde (CRT) */
+    .crt-screen {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background: #020804;
+      border-radius: 8px;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      overflow: hidden;
+      box-shadow: inset 0 0 20px rgba(34, 197, 94, 0.15);
+    }
+
+    /* Linhas de Grade de Osciloscópio */
+    .crt-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(34, 197, 94, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 197, 94, 0.07) 1px, transparent 1px);
+      background-size: 20px 20px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Scanlines retrô */
+    .crt-screen::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Painel de Leituras Digitais */
+    .telemetry-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+    }
+
+    .db-box {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .db-val {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--phosphor);
+      text-shadow: 0 0 10px var(--phosphor-glow);
+      font-family: monospace;
+      min-width: 90px;
+    }
+
+    .db-unit {
+      font-size: 0.75rem;
+      color: #15803d;
+      letter-spacing: 1px;
+    }
+
+    .status-badge {
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid #334155;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+
+    .status-badge.locked {
+      border-color: var(--phosphor);
+      color: var(--phosphor);
+      box-shadow: 0 0 10px var(--phosphor-dim);
+    }
+
+    /* Painel de Controles Inferiores */
+    .controls-panel {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Botão Calibrar Ponto Zero */
+    .btn-calibrate {
+      width: 100%;
+      padding: 12px;
+      background: #141f18;
+      border: 1px solid #2d4a36;
+      border-radius: 6px;
+      color: #a7f3d0;
+      font-family: inherit;
+      font-size: 0.8rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-calibrate:active {
+      background: #1e3325;
+    }
+
+    /* Chave ON/OFF do Microfone */
+    .power-chassis {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--panel);
+      border: 1px solid #1e2922;
+      border-radius: 8px;
+      padding: 12px 18px;
+    }
+
+    .power-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      letter-spacing: 2px;
+    }
+
+    .switch {
+      position: relative;
+      width: 60px;
+      height: 32px;
+      background: #1e2922;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+      border: 2px solid #2d4a36;
+    }
+
+    .switch-lever {
+      position: absolute;
+      top: 3px;
+      left: 4px;
+      width: 22px;
+      height: 22px;
+      background: #64748b;
+      border-radius: 50%;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .switch.active {
+      background: #064e3b;
+      border-color: var(--phosphor);
+    }
+
+    .switch.active .switch-lever {
+      transform: translateX(28px);
+      background: var(--phosphor);
+      box-shadow: 0 0 10px var(--phosphor);
+    }
+
+    .hint-text {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #475569;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topo -->
+  <div class="device-header">
+    <span class="brand-title">PARABOLIC SENSOR // PS-90</span>
+    <span class="headset-tag">🎧 HEADPHONES CONNECTED</span>
+  </div>
+
+  <!-- Gabinete Central do Osciloscópio -->
+  <div class="scope-chassis">
+    <!-- Tela de Ondas -->
+    <div class="crt-screen">
+      <div class="crt-grid"></div>
+      <canvas id="waveformCanvas"></canvas>
+    </div>
+
+    <!-- Leitura de Decibéis e Status -->
+    <div class="telemetry-row">
+      <div class="db-box">
+        <div class="db-val" id="dbDisplay">0.0</div>
+        <div class="db-unit">dB // RMS</div>
+      </div>
+      <div class="status-badge" id="signalStatus">SEARCHING</div>
+    </div>
+  </div>
+
+  <!-- Controles -->
+  <div class="controls-panel">
+    <!-- Botão de Calibração Relativa (Apontar para o Crânio) -->
+    <button class="btn-calibrate" id="btnCalibrate">
+      <span>🎯</span> Calibrate to Skull Position
+    </button>
+
+    <!-- Interruptor ON/OFF -->
+    <div class="power-chassis">
+      <span class="power-label">MIC POWER</span>
+      <div class="switch" id="powerSwitch">
+        <div class="switch-lever"></div>
+      </div>
+    </div>
+
+    <div class="hint-text">
+      Plug school headset. Sweep phone across room to isolate acoustic signature.
+    </div>
+  </div>
+
+  <!-- Áudios -->
+  <audio id="audioVacuum" src="vacuo.mp3" loop preload="auto"></audio>
+  <audio id="audioEntity" src="banshee.mp3" preload="auto"></audio>
+
+  <script>
+    // ==========================================
+    // PARÂMETROS DO MICROFONE PARABÓLICO
+    // ==========================================
+    const CONE_TOLERANCE = 18;        // Janela de foco em graus (cone de captação)
+    const HAUNT_INTERVAL = 60 * 1000; // Intervalo do uivo: 60 segundos (1 minuto)
+
+    let isPowered = false;
+    let currentSignal = 0; // 0.0 (fora de mira) a 1.0 (cravado no crânio)
+
+    // Ângulos de calibração relativa
+    let baseAlpha = null;
+    let baseBeta = null;
+    let currentAlpha = 0;
+    let currentBeta = 0;
+
+    // Elementos DOM
+    const canvas = document.getElementById('waveformCanvas');
+    const ctx = canvas.getContext('2d');
+    const dbDisplay = document.getElementById('dbDisplay');
+    const signalStatus = document.getElementById('signalStatus');
+    const powerSwitch = document.getElementById('powerSwitch');
+    const btnCalibrate = document.getElementById('btnCalibrate');
+    const audioVacuum = document.getElementById('audioVacuum');
+    const audioEntity = document.getElementById('audioEntity');
+
+    // Redimensionamento do Canvas
+    function resizeCanvas() {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // ==========================================
+    // LIGA / DESLIGA (DESTRAMA ÁUDIO E SENSORES)
+    // ==========================================
+    powerSwitch.addEventListener('click', async () => {
+      isPowered = !isPowered;
+      powerSwitch.classList.toggle('active', isPowered);
+
+      if (isPowered) {
+        // Solicita permissão de orientação no iOS se necessário
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+          try {
+            const permission = await DeviceOrientationEvent.requestPermission();
+            if (permission !== 'granted') {
+              alert('Orientation permission needed for directional mic.');
+            }
+          } catch (e) {
+            console.warn(e);
+          }
+        }
+
+        window.addEventListener('deviceorientation', handleOrientation);
+
+        // Inicia áudio de fundo
+        audioVacuum.volume = 0.05;
+        audioVacuum.play().catch(e => console.warn(e));
+
+        // Agenda o ciclo do uivo
+        startEntityTimer();
+      } else {
+        window.removeEventListener('deviceorientation', handleOrientation);
+        audioVacuum.pause();
+        audioEntity.pause();
+        stopEntityTimer();
+        currentSignal = 0;
+        dbDisplay.textContent = '0.0';
+        signalStatus.textContent = 'STANDBY';
+        signalStatus.classList.remove('locked');
+      }
+    });
+
+    // Calibração do Ponto Zero (Onde o crânio está)
+    btnCalibrate.addEventListener('click', () => {
+      baseAlpha = currentAlpha;
+      baseBeta = currentBeta;
+      btnCalibrate.textContent = "✓ Target Calibrated";
+      setTimeout(() => {
+        btnCalibrate.textContent = "🎯 Calibrate to Skull Position";
+      }, 1500);
+    });
+
+    // ==========================================
+    // CAPTAÇÃO DE GIRO E INCLINAÇÃO (3D VECTOR)
+    // ==========================================
+    function handleOrientation(e) {
+      if (!isPowered) return;
+
+      currentAlpha = e.alpha || 0; // Giro horizontal (bússola)
+      currentBeta = e.beta || 0;   // Inclinação vertical (altura)
+
+      if (baseAlpha === null || baseBeta === null) {
+        baseAlpha = currentAlpha;
+        baseBeta = currentBeta;
+      }
+
+      // Distância angular horizontal com compensação circular
+      let diffAlpha = Math.abs(currentAlpha - baseAlpha);
+      if (diffAlpha > 180) diffAlpha = 360 - diffAlpha;
+
+      // Distância angular vertical
+      let diffBeta = Math.abs(currentBeta - baseBeta);
+
+      // Distância Euclidiana angular até o alvo do crânio
+      const totalAngularDiff = Math.sqrt(Math.pow(diffAlpha, 2) + Math.pow(diffBeta, 2));
+
+      if (totalAngularDiff <= CONE_TOLERANCE) {
+        // Dentro do cone parabólico: calcula intensidade de 0.0 a 1.0
+        currentSignal = 1 - (totalAngularDiff / CONE_TOLERANCE);
+      } else {
+        currentSignal = 0;
+      }
+
+      updateOutputs();
+    }
+
+    // Atualização de Decibéis e Volumes
+    function updateOutputs() {
+      // Simula decibéis entre 0.2 e 24.5 dB com ruído natural
+      const noise = (Math.random() - 0.5) * 0.4;
+      const db = (currentSignal * 22.0) + (isPowered ? 0.3 : 0) + noise;
+      dbDisplay.textContent = Math.max(0, db).toFixed(1);
+
+      if (currentSignal > 0.75) {
+        signalStatus.textContent = "PARABOLIC LOCK";
+        signalStatus.classList.add('locked');
+      } else if (currentSignal > 0.1) {
+        signalStatus.textContent = "SIGNAL WEAK";
+        signalStatus.classList.remove('locked');
+      } else {
+        signalStatus.textContent = "NO ANOMALY";
+        signalStatus.classList.remove('locked');
+      }
+
+      // Modula o volume do vácuo contínuo
+      audioVacuum.volume = Math.min(1.0, 0.05 + (currentSignal * 0.85));
+
+      // Se o uivo estiver tocando, o volume dele sobe apenas se mirar no crânio
+      audioEntity.volume = Math.pow(currentSignal, 1.5);
+    }
+
+    // ==========================================
+    // CICLO TEMPORIZADO DO UIVO (A CADA 60s)
+    // ==========================================
+    let hauntIntervalId = null;
+
+    function startEntityTimer() {
+      stopEntityTimer();
+      hauntIntervalId = setInterval(() => {
+        if (!isPowered) return;
+        audioEntity.currentTime = 0;
+        audioEntity.play().catch(e => console.warn(e));
+      }, HAUNT_INTERVAL);
+    }
+
+    function stopEntityTimer() {
+      if (hauntIntervalId) {
+        clearInterval(hauntIntervalId);
+        hauntIntervalId = null;
+      }
+    }
+
+    // ==========================================
+    // RENDERIZAÇÃO DAS ONDAS DO OSCILOSCÓPIO (CANVAS)
+    // ==========================================
+    let phase = 0;
+
+    function drawWaveform() {
+      requestAnimationFrame(drawWaveform);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const midY = canvas.height / 2;
+      const width = canvas.width;
+
+      ctx.beginPath();
+      ctx.lineWidth = 2.5;
+
+      // Se estiver desligado: linha morta
+      if (!isPowered) {
+        ctx.strokeStyle = '#1e3828';
+        ctx.moveTo(0, midY);
+        ctx.lineTo(width, midY);
+        ctx.stroke();
+        return;
+      }
+
+      // Cor muda de verde para âmbar se o sinal for forte
+      ctx.strokeStyle = currentSignal > 0.8 ? '#f59e0b' : '#22c55e';
+      ctx.shadowColor = currentSignal > 0.8 ? 'rgba(245, 158, 11, 0.6)' : 'rgba(34, 197, 94, 0.6)';
+      ctx.shadowBlur = 10;
+
+      // Amplitude cresce com a mira e com a intensidade do sinal
+      const baseAmp = 4;
+      const maxAmp = 65;
+      const amp = baseAmp + (currentSignal * maxAmp);
+
+      phase += 0.18 + (currentSignal * 0.25);
+
+      for (let x = 0; x < width; x++) {
+        // Composição de três ondas senoidais + jitter de ruído para simular frequência real
+        const jitter = (Math.random() - 0.5) * (1.5 + currentSignal * 8);
+        const y = midY + 
+                  Math.sin((x * 0.035) + phase) * amp * 0.6 +
+                  Math.sin((x * 0.08) - phase * 1.5) * amp * 0.3 +
+                  jitter;
+
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    drawWaveform();
+  </script>
+</body>
+</html>
